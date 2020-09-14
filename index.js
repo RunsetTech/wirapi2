@@ -6,7 +6,7 @@ const graphQL = require('./graphql')
 const mongoose = require('mongoose')
 const wireguard = require('./wireguard')
 const ipWhitelist = require('ip-whitelist')
-const Server = require('/home/ubuntu/wirapi/mongoose').Server
+const Server = require('/home/ubuntu/wirapi2/mongoose').Server
 
 if(typeof URLSearchParams === 'undefined'){
     URLSearchParams = require('url').URLSearchParams;
