@@ -2,6 +2,7 @@ const execSync = require('child_process').execSync
 const Peer = require('./mongoose').Peer
 const User = require('./mongoose').User
 const Server = require('./mongoose').Server
+const IP = require('./mongoose').IP
 const {
     GraphQLError
 } = require('graphql')
@@ -68,20 +69,23 @@ async function addPeer(data) {
         }
         
 
-        let documents = await Peer.find().exec()
-        let IPs = []
+        // let documents = await Peer.find().exec()
+        // let IPs = []
 
         // loop through all peers and extract allowedIP into IPs
 
-        if(documents.length == 0) {
-            return '10.0.0.10';
+        var ips = await IP.find().exec()
+
+        if(ips.length == 0) {
+            var chosenIp =  '10.0.0.10';
+            var dbIp = new IP({ipAddress:chosenIp});
+            await dbIp.save()
+            return chosenIp;
         } else {
             ipsArray = [];
-            for (i in documents) {
-                var allowedIPStr = documents[i].allowedIP;
-                 
-                ipsArray.push(allowedIPStr);
-            }
+            ips.forEach(ip => {
+                ipsArray.push(ip);
+            });
 
             ipsArray.sort((a, b) => {
                 const num1 = Number(a.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
@@ -89,7 +93,10 @@ async function addPeer(data) {
                 return num1-num2;
             });
 
-            return incrementIp(ipsArray[(ipsArray.length - 1)]);
+            var chosenIp = incrementIp(ipsArray[(ipsArray.length - 1)]);
+            var dbIp = new IP({ipAddress:chosenIp});
+            await dbIp.save()
+            return chosenIp;
         }
         
         // console.log('unsorted IPS array : ');
@@ -127,8 +134,10 @@ async function addPeer(data) {
         }
     }
 
+    var ipAddress = await getAllowedIP();
+
     // add a peer in CLI and save to database
-    let peer = new Peer(JSON.parse(execSync('bash /home/ubuntu/wirapi2/add.sh ' + await getAllowedIP()).toString()))
+    let peer = new Peer(JSON.parse(execSync('bash /home/ubuntu/wirapi2/add.sh ' + ipAddress).toString()))
 
     // default enabled to true if it's not provided
     peer.enabled = data.enabled === undefined ? true : data.enabled

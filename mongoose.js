@@ -84,12 +84,18 @@ const serverSchema = new mongoose.Schema({
     timeUsed: { type: String }
 })
 
+const ipSchema = new mongoose.Schema({
+    ipAddress: {type: String , default: ''}
+})
+
 const Peer = mongoose.model('peers', peerSchema)
 const User = mongoose.model('users', userSchema)
 const Server = mongoose.model('server', serverSchema)
+const IP = mongoose.model('ip',ipSchema)
 
 module.exports = {
     Peer: Peer,
     User: User,
-    Server: Server
+    Server: Server,
+    IP: IP
 }
