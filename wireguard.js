@@ -338,7 +338,7 @@ async function checkStatus() {
     // get all active peers from CLI
     
 
-    let jsonString = execSync('bash /home/ubuntu/wirapi/json2.sh').toString()
+    let jsonString = execSync('bash /home/ubuntu/wirapi2/json2.sh').toString()
     // console.log(jsonString)
     let peers = JSON.parse(jsonString).peers
 
