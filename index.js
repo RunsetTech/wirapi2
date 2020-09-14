@@ -36,7 +36,7 @@ app.listen(80)
 console.log('Server running')
 
 const limiter = rateLimit({
-    windowMs: 5, // 15 minutes
+    windowMs: 8, // 15 minutes
     max: 2 // limit each IP to 100 requests per windowMs
   });
 app.use(limiter);
