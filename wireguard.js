@@ -39,8 +39,12 @@ async function initialize() {
         })
 }
 
+var checkingIp = false;
 // add a peer in WireGuard CLI and updates the database
 async function addPeer(data) {
+    if(checkingIp === false) {
+        checkingIp = true;
+        
     // function to generate a valid peer IP in sequence in the database
     async function getAllowedIP() {
         // function IPtoInt(IP) {
@@ -52,6 +56,7 @@ async function addPeer(data) {
         // }
 
         function incrementIp(input) {
+            // console.log(input);
             tokens = input.split(".");
             if (tokens.length != 4)
                 throw console.log('ip invalid');
@@ -74,17 +79,21 @@ async function addPeer(data) {
 
         // loop through all peers and extract allowedIP into IPs
 
+        
+        
         var ips = await IP.find().exec()
+       
 
         if(ips.length == 0) {
             var chosenIp =  '10.0.0.10';
             var dbIp = new IP({ipAddress:chosenIp});
             await dbIp.save()
+           
             return chosenIp;
         } else {
             ipsArray = [];
             ips.forEach(ip => {
-                ipsArray.push(ip);
+                ipsArray.push(ip.ipAddress);
             });
 
             ipsArray.sort((a, b) => {
@@ -96,6 +105,7 @@ async function addPeer(data) {
             var chosenIp = incrementIp(ipsArray[(ipsArray.length - 1)]);
             var dbIp = new IP({ipAddress:chosenIp});
             await dbIp.save()
+            
             return chosenIp;
         }
         
@@ -160,8 +170,13 @@ async function addPeer(data) {
         blockPeers({ publicKey: peer.publicKey })
     }
 
+    checkingIp = false;
     // return the peer object
     return peer
+} else {
+    
+    throw new GraphQLError('conncurrent')
+}
 
 }
 

@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const wireguard = require('./wireguard')
 const ipWhitelist = require('ip-whitelist')
 const Server = require('/home/ubuntu/wirapi2/mongoose').Server
+const rateLimit = require("express-rate-limit");
 
 if(typeof URLSearchParams === 'undefined'){
     URLSearchParams = require('url').URLSearchParams;
@@ -34,6 +35,12 @@ wireguard.initialize()
 app.listen(80)
 console.log('Server running')
 
+const limiter = rateLimit({
+    windowMs: 5, // 15 minutes
+    max: 2 // limit each IP to 100 requests per windowMs
+  });
+app.use(limiter);
+  
 /* // debugging code to find your IP address
 app.use((req, res, next) => {
     console.log(req.connection.remoteAddress)
