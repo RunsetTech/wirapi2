@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const wireguard = require('./wireguard')
 const ipWhitelist = require('ip-whitelist')
 const Server = require('/home/ubuntu/wirapi2/mongoose').Server
+const Counter = require('/home/ubuntu/wirapi2/mongoose').Counter
 const rateLimit = require("express-rate-limit");
 
 if(typeof URLSearchParams === 'undefined'){
@@ -25,9 +26,22 @@ if (process.env.SUDO_UID) {
     process.exit(-1)
 }
 
+Counter.find({},function(err,counter) {
+    if(err) {
+        
+    } else {
+        if(counter.length === 0) {
+            var newCounter = new Counter();
+            newCounter.counter = 11;
+            newCounter.save();
+        }
+    }
+})
+
 // load peer information in the database into WireGuard CLI
 wireguard.initialize()
     .then(console.log('WireGuard initialized'))
+
 
 
 
@@ -37,7 +51,7 @@ console.log('Server running')
 
 const limiter = rateLimit({
     windowMs: 8, // 15 minutes
-    max: 2 // limit each IP to 100 requests per windowMs
+    max: 3 // limit each IP to 100 requests per windowMs
   });
 app.use(limiter);
   
