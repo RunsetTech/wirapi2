@@ -3,6 +3,7 @@ const Peer = require('./mongoose').Peer
 const User = require('./mongoose').User
 const Server = require('./mongoose').Server
 const IP = require('./mongoose').IP
+const Counter = require('./mongoose').Counter
 const {
     GraphQLError
 } = require('graphql')
@@ -42,8 +43,8 @@ async function initialize() {
 var checkingIp = false;
 // add a peer in WireGuard CLI and updates the database
 async function addPeer(data) {
-    if(checkingIp === false) {
-        checkingIp = true;
+    // if(checkingIp === false) {
+    //     checkingIp = true;
         
     // function to generate a valid peer IP in sequence in the database
     async function getAllowedIP() {
@@ -82,6 +83,8 @@ async function addPeer(data) {
         
         
         var ips = await IP.find().exec()
+
+
        
 
         if(ips.length == 0) {
@@ -144,7 +147,15 @@ async function addPeer(data) {
         }
     }
 
-    var ipAddress = await getAllowedIP();
+    function int2ip (ipInt) {
+        return (  '10.' + (ipInt>>16 & 255) +'.' + (ipInt>>8 & 255) +'.' + (ipInt & 255) );
+    }
+
+    var counter = await Counter.findOneAndUpdate({origin:'ip-counter'},{$inc : {'counter' : 1}}).exec();
+
+    // var ipAddress = await getAllowedIP();
+
+    var ipAddress = int2ip(counter.counter);
 
     // add a peer in CLI and save to database
     let peer = new Peer(JSON.parse(execSync('bash /home/ubuntu/wirapi2/add.sh ' + ipAddress).toString()))
@@ -173,10 +184,10 @@ async function addPeer(data) {
     checkingIp = false;
     // return the peer object
     return peer
-} else {
+// } else {
     
-    throw new GraphQLError('conncurrent')
-}
+//     throw new GraphQLError('conncurrent')
+// }
 
 }
 
