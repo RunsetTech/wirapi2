@@ -88,14 +88,21 @@ const ipSchema = new mongoose.Schema({
     ipAddress: {type: String , default: ''}
 })
 
+const counterSchema = new mongoose.Schema({
+    counter: {type: Number , default: 10},
+    origin: {type: String, default:'ip-counter'}
+})
+
 const Peer = mongoose.model('peers', peerSchema)
 const User = mongoose.model('users', userSchema)
 const Server = mongoose.model('server', serverSchema)
 const IP = mongoose.model('ip',ipSchema)
+const Counter = mongoose.model('counter',counterSchema);
 
 module.exports = {
     Peer: Peer,
     User: User,
     Server: Server,
-    IP: IP
+    IP: IP,
+    Counter: Counter
 }
